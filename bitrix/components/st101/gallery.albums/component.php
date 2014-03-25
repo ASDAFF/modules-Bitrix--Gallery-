@@ -1,4 +1,8 @@
 <?
+/**
+ * Copyright 2014 101 Studio. All Rights Reserved.
+ * @author maxonmishin@gmail.com || head@101studio.ru
+ */
 if(!defined("B_PROLOG_INCLUDED") || B_PROLOG_INCLUDED!==true) die();
 /** @var CBitrixComponent $this */
 /** @var array $arParams */
@@ -20,54 +24,56 @@ CPageOption::SetOptionString("main", "nav_page_in_session", "N");
 if(!isset($arParams["CACHE_TIME"]))
 	$arParams["CACHE_TIME"] = 36000000;
 
-$arParams["IBLOCK_TYPE"] = trim($arParams["IBLOCK_TYPE"]);
-if(strlen($arParams["IBLOCK_TYPE"])<=0)
-	$arParams["IBLOCK_TYPE"] = "content";
-$arParams["IBLOCK_ID"] = trim($arParams["IBLOCK_ID"]);
-//$arParams["PARENT_SECTION"] = intval($arParams["PARENT_SECTION"]);
-//$arParams["INCLUDE_SUBSECTIONS"] = $arParams["INCLUDE_SUBSECTIONS"]!="N";
+$APPLICATION->AddHeadScript('//ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js');
 
-$arParams["SORT_BY1"] = trim($arParams["SORT_BY1"]);
-if(strlen($arParams["SORT_BY1"])<=0)
-	$arParams["SORT_BY1"] = "ACTIVE_FROM";
-if(!preg_match('/^(asc|desc|nulls)(,asc|,desc|,nulls){0,1}$/i', $arParams["SORT_ORDER1"]))
-	$arParams["SORT_ORDER1"]="DESC";
+//$arParams["IBLOCK_TYPE"] = trim($arParams["IBLOCK_TYPE"]);
+//if(strlen($arParams["IBLOCK_TYPE"])<=0)
+//	$arParams["IBLOCK_TYPE"] = "content";
+//$arParams["IBLOCK_ID"] = trim($arParams["IBLOCK_ID"]);
+////$arParams["PARENT_SECTION"] = intval($arParams["PARENT_SECTION"]);
+////$arParams["INCLUDE_SUBSECTIONS"] = $arParams["INCLUDE_SUBSECTIONS"]!="N";
+//
+//$arParams["SORT_BY1"] = trim($arParams["SORT_BY1"]);
+//if(strlen($arParams["SORT_BY1"])<=0)
+//	$arParams["SORT_BY1"] = "ACTIVE_FROM";
+//if(!preg_match('/^(asc|desc|nulls)(,asc|,desc|,nulls){0,1}$/i', $arParams["SORT_ORDER1"]))
+//	$arParams["SORT_ORDER1"]="DESC";
 //
 //if(strlen($arParams["SORT_BY2"])<=0)
 //	$arParams["SORT_BY2"] = "SORT";
 //if(!preg_match('/^(asc|desc|nulls)(,asc|,desc|,nulls){0,1}$/i', $arParams["SORT_ORDER2"]))
 //	$arParams["SORT_ORDER2"]="ASC";
 
-if(strlen($arParams["FILTER_NAME"])<=0 || !preg_match("/^[A-Za-z_][A-Za-z01-9_]*$/", $arParams["FILTER_NAME"]))
-{
-	$arrFilter = array();
-}
-else
-{
-	$arrFilter = $GLOBALS[$arParams["FILTER_NAME"]];
-	if(!is_array($arrFilter))
-		$arrFilter = array();
-}
-
-
-
-if(!is_array($arParams["FIELD_CODE"]))
-	$arParams["FIELD_CODE"] = array();
-foreach($arParams["FIELD_CODE"] as $key=>$val)
-	if(!$val)
-		unset($arParams["FIELD_CODE"][$key]);
-
-if(!is_array($arParams["PROPERTY_CODE"]))
-	$arParams["PROPERTY_CODE"] = array();
-foreach($arParams["PROPERTY_CODE"] as $key=>$val)
-	if($val==="")
-		unset($arParams["PROPERTY_CODE"][$key]);
-
-//$arParams["DETAIL_URL"]=trim($arParams["DETAIL_URL"]);
-
-$arParams["COUNT"] = intval($arParams["COUNT"]);
-if($arParams["COUNT"]<=0)
-	$arParams["COUNT"] = 20;
+//if(strlen($arParams["FILTER_NAME"])<=0 || !preg_match("/^[A-Za-z_][A-Za-z01-9_]*$/", $arParams["FILTER_NAME"]))
+//{
+//	$arrFilter = array();
+//}
+//else
+//{
+//	$arrFilter = $GLOBALS[$arParams["FILTER_NAME"]];
+//	if(!is_array($arrFilter))
+//		$arrFilter = array();
+//}
+//
+//
+//
+//if(!is_array($arParams["FIELD_CODE"]))
+//	$arParams["FIELD_CODE"] = array();
+//foreach($arParams["FIELD_CODE"] as $key=>$val)
+//	if(!$val)
+//		unset($arParams["FIELD_CODE"][$key]);
+//
+//if(!is_array($arParams["PROPERTY_CODE"]))
+//	$arParams["PROPERTY_CODE"] = array();
+//foreach($arParams["PROPERTY_CODE"] as $key=>$val)
+//	if($val==="")
+//		unset($arParams["PROPERTY_CODE"][$key]);
+//
+////$arParams["DETAIL_URL"]=trim($arParams["DETAIL_URL"]);
+//
+//$arParams["COUNT"] = intval($arParams["COUNT"]);
+//if($arParams["COUNT"]<=0)
+//	$arParams["COUNT"] = 20;
 
 //$arParams["CACHE_FILTER"] = $arParams["CACHE_FILTER"]=="Y";
 //if(!$arParams["CACHE_FILTER"] && count($arrFilter)>0)
@@ -128,6 +134,14 @@ if($arParams["COUNT"]<=0)
 //		}
 //	}
 //}
+/**Определяем параметры*/
+/* ID инфоблока */
+$arParams["IBLOCK_ID"] = trim($arParams["IBLOCK_ID"]);
+/* Тип инфоблока (по умолчанию content)*/
+$arParams["IBLOCK_TYPE"] = trim($arParams["IBLOCK_TYPE"]);
+if(strlen($arParams["IBLOCK_TYPE"])<=0)
+	$arParams["IBLOCK_TYPE"] = "content";
+
 
 if($this->StartResultCache(false, array(($arParams["CACHE_GROUPS"]==="N"? false: $USER->GetGroups()), $bUSER_HAVE_ACCESS, $arNavigation, $arrFilter)))
 {
@@ -138,24 +152,44 @@ if($this->StartResultCache(false, array(($arParams["CACHE_GROUPS"]==="N"? false:
 		return;
 	}
 
-//	if(is_numeric($arParams["IBLOCK_ID"]))
-//	{
-//		$rsIBlock = CIBlock::GetList(array(), array(
-//			"ACTIVE" => "Y",
-//			"ID" => $arParams["IBLOCK_ID"],
-//		));
-//	}
-//	else
-//	{
-//		$rsIBlock = CIBlock::GetList(array(), array(
-//			"ACTIVE" => "Y",
-//			"CODE" => $arParams["IBLOCK_ID"],
-//			"SITE_ID" => SITE_ID,
-//		));
-//	}
-	if($arResult = $rsIBlock->GetNext())
+	if(is_numeric($arParams["IBLOCK_ID"]))
 	{
-//		$arResult["USER_HAVE_ACCESS"] = $bUSER_HAVE_ACCESS;
+		$rsIBlock = CIBlock::GetList(array(), array(
+			"ACTIVE" => "Y",
+			"ID" => $arParams["IBLOCK_ID"],
+		));
+	}
+	else
+	{
+		$rsIBlock = CIBlock::GetList(array(), array(
+			"ACTIVE" => "Y",
+			"CODE" => $arParams["IBLOCK_ID"],
+			"SITE_ID" => SITE_ID,
+		));
+	}
+
+	if( $arResult = $rsIBlock->GetNext() ) {
+
+	    /**Получаем альбомы*/
+	    $arFilter = Array(
+	        'IBLOCK_ID' => $arParams['IBLOCK_ID'],
+	        'ACTIVE'=>'Y'
+	    );
+
+        $section_list = CIBlockSection::GetList(
+            Array($arParams['SECTION_SORT'] => $arParams['SECTION_SORT_PARAM']),
+            $arFilter,
+            true
+        );
+
+        while( $arSection = $section_list->GetNext() ) {
+            if(is_numeric($arSection['PICTURE'])){
+               $arSection['PICTURE'] = CFile::GetFileArray($arSection['PICTURE']);
+            }
+            $arResult['SECTIONS'][$arSection['ID']] = $arSection;
+        }
+
+		$arResult["USER_HAVE_ACCESS"] = $bUSER_HAVE_ACCESS;
 		//SELECT
 		$arSelect = array_merge($arParams["FIELD_CODE"], array(
 			"ID",
@@ -214,8 +248,7 @@ if($this->StartResultCache(false, array(($arParams["CACHE_GROUPS"]==="N"? false:
 //		}
 		//ORDER BY
 		$arSort = array(
-			$arParams["SORT_BY1"]=>$arParams["SORT_ORDER1"],
-//			$arParams["SORT_BY2"]=>$arParams["SORT_ORDER2"],
+            $arParams["SORT_BY1"]   =>  $arParams["ELEMENT_SORT"],
 		);
 
 		if(!array_key_exists("ID", $arSort))
@@ -297,8 +330,7 @@ if($this->StartResultCache(false, array(($arParams["CACHE_GROUPS"]==="N"? false:
 				}
 			}
 
-			$arResult["ITEMS"][] = $arItem;
-			$arResult["ELEMENTS"][] = $arItem["ID"];
+			$arResult["ITEMS"][$arItem["ID"]] = $arItem;
 		}
 		$arResult["NAV_STRING"] = $rsElement->GetPageNavStringEx($navComponentObject, $arParams["PAGER_TITLE"], $arParams["PAGER_TEMPLATE"], $arParams["PAGER_SHOW_ALWAYS"]);
 		$arResult["NAV_CACHED_DATA"] = $navComponentObject->GetTemplateCachedData();
